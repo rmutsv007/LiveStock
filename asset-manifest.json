@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/LiveStock/static/css/main.84c3dcd6.css",
-    "main.js": "/LiveStock/static/js/main.9cf36373.js",
+    "main.css": "/LiveStock/static/css/main.67cd1c97.css",
+    "main.js": "/LiveStock/static/js/main.4c6628b1.js",
     "static/js/488.5dc00adb.chunk.js": "/LiveStock/static/js/488.5dc00adb.chunk.js",
     "static/media/map.png": "/LiveStock/static/media/map.ba21435080fcce27ca31.png",
     "static/media/Marker.png": "/LiveStock/static/media/Marker.0fc87dbf4ac94d0b1fab.png",
     "index.html": "/LiveStock/index.html",
-    "main.84c3dcd6.css.map": "/LiveStock/static/css/main.84c3dcd6.css.map",
-    "main.9cf36373.js.map": "/LiveStock/static/js/main.9cf36373.js.map",
+    "main.67cd1c97.css.map": "/LiveStock/static/css/main.67cd1c97.css.map",
+    "main.4c6628b1.js.map": "/LiveStock/static/js/main.4c6628b1.js.map",
     "488.5dc00adb.chunk.js.map": "/LiveStock/static/js/488.5dc00adb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.84c3dcd6.css",
-    "static/js/main.9cf36373.js"
+    "static/css/main.67cd1c97.css",
+    "static/js/main.4c6628b1.js"
   ]
 }
