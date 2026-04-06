@@ -3,64 +3,104 @@
   z-index: 99999 !important;
 }
 
-/* ป้องกัน popup ถูกตัดขอบ */
 .leaflet-container {
   overflow: visible !important;
 }
-/* Remove black outline/focus ring from Leaflet popups and tooltips */
+
 .leaflet-popup-content-wrapper:focus,
 .leaflet-popup-content:focus,
 .leaflet-tooltip:focus,
-.leaflet-popup:focus,
-.leaflet-tooltip {
-  outline: 1px solid #3b82f6 !important;
+.leaflet-popup:focus {
+  outline: none !important;
   box-shadow: none !important;
 }
+
 .leaflet-control-zoom {
   bottom: 0px !important;
   top: auto !important;
 }
 
-/* Professional Map Controls */
+/* Map Controls - Theme Aware */
 .leaflet-control-zoom a {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-  color: #fff !important;
-  border: none !important;
-  width: 40px !important;
-  height: 40px !important;
-  line-height: 40px !important;
-  font-size: 18px !important;
+  background: linear-gradient(135deg, var(--c-zoom-start) 0%, var(--c-zoom-end) 100%) !important;
+  color: var(--c-zoom-text) !important;
+  border: 1px solid var(--c-accent-border) !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 16px !important;
   border-radius: 8px !important;
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3) !important;
+  box-shadow: var(--c-shadow) !important;
   margin-bottom: 4px !important;
   transition: all 0.25s ease !important;
 }
 
 .leaflet-control-zoom a:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+  background: linear-gradient(135deg, var(--c-zoom-hover-start) 0%, var(--c-zoom-hover-end) 100%) !important;
+  border-color: var(--c-accent-border) !important;
 }
 
 .leaflet-control-zoom a:active {
   background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+  color: #fff !important;
 }
 
-/* Map Popup Styling */
+/* Map Popup - Theme Aware */
 .leaflet-popup-content-wrapper {
-  background: linear-gradient(135deg, #fff 0%, #f9fafb 100%) !important;
+  background: linear-gradient(135deg, var(--c-popup-start) 0%, var(--c-popup-end) 100%) !important;
   border-radius: 12px !important;
-  border: 1px solid #1e40af !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid var(--c-accent-border) !important;
+  box-shadow: var(--c-shadow-lg) !important;
+  color: var(--c-text) !important;
 }
 
 .leaflet-popup-content {
-  margin: 12px !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  margin: 14px !important;
+  font-family: 'Sarabun-Medium', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  color: var(--c-text) !important;
 }
 
 .leaflet-popup-tip {
-  background: #fff !important;
-  border: 1px solid #1e40af !important;
+  background: var(--c-popup-tip) !important;
+  border: 1px solid var(--c-accent-border) !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--c-text-secondary) !important;
+  font-size: 20px !important;
+  padding: 6px 8px !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--c-text) !important;
+}
+
+/* Tooltip - Theme Aware */
+.leaflet-tooltip {
+  background: var(--c-tooltip-bg) !important;
+  color: var(--c-tooltip-text) !important;
+  border: 1px solid var(--c-tooltip-border) !important;
+  border-radius: 6px !important;
+  font-family: 'Sarabun-Medium', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 4px 10px !important;
+  box-shadow: var(--c-shadow) !important;
+}
+
+.leaflet-tooltip-top::before {
+  border-top-color: var(--c-tooltip-bg) !important;
+}
+
+/* Attribution */
+.leaflet-control-attribution {
+  background: var(--c-attribution-bg) !important;
+  color: var(--c-attribution-text) !important;
+  font-size: 10px !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--c-attribution-text) !important;
 }
 
 /* Interactive elements */
@@ -68,6 +108,6 @@
 .leaflet-interactive:active,
 .leaflet-interactive {
   outline: none !important;
-  stroke: #f8717100 !important; /* โปร่งใส */
+  stroke: #f8717100 !important;
   stroke-width: 0 !important;
 }

@@ -3,58 +3,92 @@ import Legend from './Legend';
 
 const LegendFloating = ({ open, setOpen }) => {
   return (
-    <div style={{ position: 'fixed', left: 20, bottom: 20, zIndex: 2500, maxWidth: 340 }}>
+    <div style={{ position: 'fixed', left: 20, bottom: 20, zIndex: 2500, maxWidth: 320 }}>
       {!open ? (
         <button
           onClick={() => setOpen(true)}
           style={{
-            border: 'none',
-            borderRadius: 18,
-            background: '#fff',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.13)',
-            padding: '8px 22px 8px 18px',
-            fontSize: 16,
-            color: '#222',
-            fontWeight: 500,
+            border: '1px solid var(--c-accent-border)',
+            borderRadius: 10,
+            background: 'linear-gradient(135deg, var(--c-bg-secondary) 0%, var(--c-bg-primary) 100%)',
+            boxShadow: 'var(--c-shadow-card)',
+            padding: '8px 18px',
+            fontSize: 13,
+            color: 'var(--c-text)',
+            fontWeight: 600,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            minWidth: 120,
+            minWidth: 100,
+            transition: 'all 0.2s',
+            fontFamily: 'Sarabun-Medium, sans-serif',
           }}
         >
-          <span>คำอธิบาย/เกณฑ์สี</span>
-          <span style={{ fontSize: 18, marginLeft: 2, color: '#888' }}>▼</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="1" y="1" width="14" height="14" rx="3" stroke="#60a5fa" strokeWidth="1.5" fill="none"/>
+            <rect x="4" y="4" width="3" height="3" rx="1" fill="#60a5fa"/>
+            <line x1="9" y1="5.5" x2="13" y2="5.5" stroke="#60a5fa" strokeWidth="1.2" strokeLinecap="round"/>
+            <rect x="4" y="9" width="3" height="3" rx="1" fill="#60a5fa"/>
+            <line x1="9" y1="10.5" x2="13" y2="10.5" stroke="#60a5fa" strokeWidth="1.2" strokeLinecap="round"/>
+          </svg>
+          คำอธิบายสัญลักษณ์
         </button>
       ) : (
         <div style={{
-          background: '#fff',
-          borderRadius: 18,
-          boxShadow: '0 4px 24px rgba(0,0,0,0.16)',
-          padding: '18px 18px 12px 18px',
+          background: 'linear-gradient(135deg, var(--c-bg-secondary) 0%, var(--c-bg-primary) 100%)',
+          borderRadius: 12,
+          border: '1px solid var(--c-accent-border)',
+          boxShadow: 'var(--c-shadow-card)',
+          padding: '16px',
           minWidth: 220,
-          maxWidth: 340,
+          maxWidth: 320,
           minHeight: 80,
           position: 'relative',
         }}>
-          <div style={{ fontWeight: 600, fontSize: 17, marginBottom: 10, color: '#222', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span>คำอธิบาย/เกณฑ์สี</span>
+          <div style={{
+            fontWeight: 600,
+            fontSize: 14,
+            marginBottom: 12,
+            color: 'var(--c-text)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingBottom: 10,
+            borderBottom: '1px solid var(--c-border)',
+          }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <rect x="1" y="1" width="14" height="14" rx="3" stroke="#60a5fa" strokeWidth="1.5" fill="none"/>
+                <rect x="4" y="4" width="3" height="3" rx="1" fill="#60a5fa"/>
+                <line x1="9" y1="5.5" x2="13" y2="5.5" stroke="#60a5fa" strokeWidth="1.2" strokeLinecap="round"/>
+                <rect x="4" y="9" width="3" height="3" rx="1" fill="#60a5fa"/>
+                <line x1="9" y1="10.5" x2="13" y2="10.5" stroke="#60a5fa" strokeWidth="1.2" strokeLinecap="round"/>
+              </svg>
+              คำอธิบายสัญลักษณ์
+            </span>
             <button
               onClick={() => setOpen(false)}
               style={{
-                background: 'none',
-                border: 'none',
-                fontSize: 20,
-                color: '#888',
+                background: 'var(--c-bg-icon)',
+                border: '1px solid var(--c-border-input)',
+                borderRadius: 6,
+                width: 24,
+                height: 24,
+                fontSize: 14,
+                color: 'var(--c-text-secondary)',
                 cursor: 'pointer',
-                marginLeft: 8,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 padding: 0,
                 lineHeight: 1,
+                transition: 'all 0.2s',
               }}
               aria-label="ปิด"
             >×</button>
           </div>
-          <div style={{ maxHeight: 260, overflowY: 'auto', paddingRight: 2 }}>
+          <div style={{ maxHeight: 280, overflowY: 'auto', paddingRight: 2 }}>
             <Legend />
           </div>
         </div>

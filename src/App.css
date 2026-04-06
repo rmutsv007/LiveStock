@@ -1,66 +1,70 @@
-/* Dashboard Styles */
+/* Dashboard Styles - Dark Theme */
 .dashboard-container {
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  background: #0f172a;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
   padding: 24px;
   min-width: 320px;
   max-width: 400px;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 .dashboard-container h2 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   margin-bottom: 18px;
-  color: #1e293b;
+  color: #e2e8f0;
 }
 .dashboard-container .dashboard-summary {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 24px;
 }
 .dashboard-container .dashboard-summary-card {
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 12px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.06);
 }
-.dashboard-container .dashboard-summary-card.total { background: #f3f4f6; color: #64748b; }
-.dashboard-container .dashboard-summary-card.active { background: #dcfce7; color: #22c55e; }
-.dashboard-container .dashboard-summary-card.quarantine { background: #fee2e2; color: #ef4444; }
-.dashboard-container .dashboard-summary-card.animals { background: #e0e7ff; color: #3b82f6; }
+.dashboard-container .dashboard-summary-card.total { background: rgba(100,116,139,0.1); color: #94a3b8; }
+.dashboard-container .dashboard-summary-card.active { background: rgba(34,197,94,0.08); color: #4ade80; }
+.dashboard-container .dashboard-summary-card.quarantine { background: rgba(239,68,68,0.08); color: #f87171; }
+.dashboard-container .dashboard-summary-card.animals { background: rgba(59,130,246,0.08); color: #60a5fa; }
 .dashboard-container .dashboard-list {
   margin-top: 24px;
 }
 .dashboard-container .dashboard-list-title {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   margin-bottom: 8px;
-  color: #222;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 .dashboard-container .dashboard-list-item {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 8px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 .dashboard-container .dashboard-list-item .dot {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: #3b82f6;
   display: inline-block;
 }
 .dashboard-container .dashboard-list-item .name {
   font-weight: 500;
-  color: #1e40af;
+  color: #e2e8f0;
   flex: 1;
-  font-size: 14px;
+  font-size: 13px;
 }
 .dashboard-container .dashboard-list-item .animals {
-  color: #64748b;
-  font-size: 13px;
+  color: #94a3b8;
+  font-size: 12px;
 }
 /* Professional Modern Design */
 * {
@@ -70,9 +74,9 @@
 
 .App {
   text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Roboto', 'Arial', sans-serif;
-  background: #f5f7fa;
-  color: #1f2937;
+  font-family: 'Sarabun-Medium', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Roboto', 'Arial', sans-serif;
+  background: #0a0f1a;
+  color: #e2e8f0;
 }
 
 .App-logo {
@@ -87,14 +91,14 @@
 }
 
 .App-header {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #e2e8f0;
 }
 
 .App-link {

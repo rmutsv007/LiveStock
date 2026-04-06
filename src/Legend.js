@@ -10,16 +10,36 @@ const getLegendUrl = (layerName) =>
 const Legend = () => {
   return (
     <>
-      <div style={{ fontWeight: 'bold', marginBottom: 10, fontSize: 16, color: '#1a237e' }}>คำอธิบายสัญลักษณ์</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {layers.map(layer => (
-          <div key={layer.id} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 2, background: '#f6f9f3', borderRadius: 6, padding: '6px 10px' }}>
-            <img
-              src={getLegendUrl(layer.name)}
-              alt={layer.name}
-              style={{ width: 28, height: 28, background: '#fff', borderRadius: 4, border: '1px solid #ccc', objectFit: 'contain', marginRight: 4 }}
-            />
-            <span style={{ fontSize: 15, color: '#222', fontWeight: 500 }}>{layer.name}</span>
+          <div key={layer.id} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            background: 'var(--c-bg-subtle)',
+            borderRadius: 8,
+            padding: '8px 10px',
+            border: '1px solid var(--c-border)',
+            transition: 'background 0.2s',
+          }}>
+            <div style={{
+              width: 30,
+              height: 30,
+              borderRadius: 6,
+              background: 'var(--c-bg-icon)',
+              border: '1px solid var(--c-bg-icon-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <img
+                src={getLegendUrl(layer.name)}
+                alt={layer.name}
+                style={{ width: 20, height: 20, objectFit: 'contain' }}
+              />
+            </div>
+            <span style={{ fontSize: 13, color: 'var(--c-text)', fontWeight: 500 }}>{layer.name}</span>
           </div>
         ))}
       </div>

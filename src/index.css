@@ -1,7 +1,145 @@
+/* ===== Theme Variables ===== */
+:root,
+[data-theme="dark"] {
+  --c-bg-app: #0a0f1a;
+  --c-bg-primary: #0f172a;
+  --c-bg-secondary: #1e293b;
+  --c-bg-hover: rgba(59,130,246,0.1);
+  --c-bg-active: rgba(59,130,246,0.15);
+  --c-bg-input: rgba(255,255,255,0.05);
+  --c-bg-input-focus: rgba(255,255,255,0.08);
+  --c-bg-subtle: rgba(255,255,255,0.03);
+  --c-bg-icon: rgba(255,255,255,0.06);
+  --c-bg-icon-border: rgba(255,255,255,0.04);
+  --c-text: #e2e8f0;
+  --c-text-secondary: #94a3b8;
+  --c-text-muted: rgba(148,163,184,0.5);
+  --c-text-heading: #f1f5f9;
+  --c-border: rgba(255,255,255,0.06);
+  --c-border-subtle: rgba(255,255,255,0.04);
+  --c-border-input: rgba(255,255,255,0.1);
+  --c-accent: #3b82f6;
+  --c-accent-light: #60a5fa;
+  --c-accent-text: #60a5fa;
+  --c-accent-bg: rgba(59,130,246,0.15);
+  --c-accent-border: rgba(59,130,246,0.2);
+  --c-accent-bg-hover: rgba(59,130,246,0.25);
+  --c-accent-badge-bg: rgba(59,130,246,0.1);
+  --c-green: #4ade80;
+  --c-green-bg: rgba(22,163,74,0.15);
+  --c-green-border: rgba(22,163,74,0.2);
+  --c-green-bg-hover: rgba(22,163,74,0.25);
+  --c-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  --c-shadow-lg: 0 4px 24px rgba(0,0,0,0.2);
+  --c-shadow-card: 0 4px 20px rgba(0,0,0,0.4);
+  --c-header-start: #0f172a;
+  --c-header-end: #1e293b;
+  --c-sidebar-start: #0f172a;
+  --c-sidebar-end: #1e293b;
+  --c-popup-start: #1e293b;
+  --c-popup-end: #0f172a;
+  --c-popup-tip: #1e293b;
+  --c-tooltip-bg: rgba(15,23,42,0.95);
+  --c-tooltip-text: #e2e8f0;
+  --c-tooltip-border: rgba(59,130,246,0.2);
+  --c-zoom-start: #1e293b;
+  --c-zoom-end: #0f172a;
+  --c-zoom-hover-start: #1e3a5f;
+  --c-zoom-hover-end: #1e293b;
+  --c-zoom-text: #60a5fa;
+  --c-attribution-bg: rgba(15,23,42,0.8);
+  --c-attribution-text: rgba(148,163,184,0.5);
+  --c-logo-filter: brightness(1.1);
+  --c-check-border: rgba(148,163,184,0.3);
+  --c-layer-name: rgba(226,232,240,0.9);
+  --c-layer-name-active: #fff;
+  --c-scrollbar: rgba(148,163,184,0.2);
+  --c-scrollbar-hover: rgba(148,163,184,0.35);
+  --c-sidebar-header: rgba(148,163,184,0.8);
+  --c-footer-text: rgba(148,163,184,0.5);
+}
+
+[data-theme="light"] {
+  --c-bg-app: #f0f4f8;
+  --c-bg-primary: #ffffff;
+  --c-bg-secondary: #f1f5f9;
+  --c-bg-hover: rgba(59,130,246,0.06);
+  --c-bg-active: rgba(59,130,246,0.1);
+  --c-bg-input: #f1f5f9;
+  --c-bg-input-focus: #e8edf3;
+  --c-bg-subtle: rgba(0,0,0,0.02);
+  --c-bg-icon: rgba(0,0,0,0.04);
+  --c-bg-icon-border: rgba(0,0,0,0.06);
+  --c-text: #1e293b;
+  --c-text-secondary: #64748b;
+  --c-text-muted: rgba(100,116,139,0.5);
+  --c-text-heading: #0f172a;
+  --c-border: #e2e8f0;
+  --c-border-subtle: #f1f5f9;
+  --c-border-input: #d1d5db;
+  --c-accent: #2563eb;
+  --c-accent-light: #3b82f6;
+  --c-accent-text: #2563eb;
+  --c-accent-bg: rgba(37,99,235,0.08);
+  --c-accent-border: rgba(37,99,235,0.15);
+  --c-accent-bg-hover: rgba(37,99,235,0.12);
+  --c-accent-badge-bg: rgba(37,99,235,0.08);
+  --c-green: #16a34a;
+  --c-green-bg: rgba(22,163,74,0.08);
+  --c-green-border: rgba(22,163,74,0.15);
+  --c-green-bg-hover: rgba(22,163,74,0.12);
+  --c-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --c-shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+  --c-shadow-card: 0 2px 12px rgba(0,0,0,0.08);
+  --c-header-start: #ffffff;
+  --c-header-end: #f8fafc;
+  --c-sidebar-start: #ffffff;
+  --c-sidebar-end: #f8fafc;
+  --c-popup-start: #ffffff;
+  --c-popup-end: #f8fafc;
+  --c-popup-tip: #ffffff;
+  --c-tooltip-bg: rgba(255,255,255,0.97);
+  --c-tooltip-text: #1e293b;
+  --c-tooltip-border: #e2e8f0;
+  --c-zoom-start: #ffffff;
+  --c-zoom-end: #f8fafc;
+  --c-zoom-hover-start: #f1f5f9;
+  --c-zoom-hover-end: #e2e8f0;
+  --c-zoom-text: #2563eb;
+  --c-attribution-bg: rgba(255,255,255,0.85);
+  --c-attribution-text: rgba(100,116,139,0.6);
+  --c-logo-filter: none;
+  --c-check-border: #d1d5db;
+  --c-layer-name: #374151;
+  --c-layer-name-active: #1e293b;
+  --c-scrollbar: rgba(148,163,184,0.3);
+  --c-scrollbar-hover: rgba(148,163,184,0.5);
+  --c-sidebar-header: #64748b;
+  --c-footer-text: rgba(100,116,139,0.6);
+}
+
+/* ===== Global Styles ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Theme transition — Circular Reveal */
+.theme-reveal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  pointer-events: none;
+  animation: circularReveal 0.6s ease-in-out forwards;
+}
+
+@keyframes circularReveal {
+  from { clip-path: circle(0% at var(--reveal-x) var(--reveal-y)); }
+  to   { clip-path: circle(150% at var(--reveal-x) var(--reveal-y)); }
 }
 
 html, body, #root {
@@ -11,9 +149,9 @@ html, body, #root {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif;
-  background: #f5f7fa;
-  color: #1f2937;
+  font-family: 'Sarabun-Medium', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif;
+  background: var(--c-bg-app);
+  color: var(--c-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
@@ -21,29 +159,30 @@ body {
 
 code {
   font-family: 'Courier New', monospace;
-  background: #f3f4f6;
+  background: var(--c-bg-icon);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.9em;
+  color: var(--c-accent-light);
 }
 
-/* Scrollbar Styling */
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f3f4f6;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--c-scrollbar);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: var(--c-scrollbar-hover);
 }
 
 /* Button Resets */

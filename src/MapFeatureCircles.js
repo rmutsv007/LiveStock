@@ -4,26 +4,32 @@ import React from 'react';
 
 function buildPopupContent(feature, lat, lng, onViewDetail) {
   const wrapper = document.createElement('div');
-  wrapper.style.minWidth = '200px';
+  wrapper.style.minWidth = '220px';
   wrapper.style.textAlign = 'left';
   wrapper.style.fontFamily = 'Sarabun-Medium, sans-serif';
-    // Removed styles to use only Leaflet popup style
+  wrapper.style.color = 'var(--c-text)';
 
   // Farm name centered and bold
   const title = document.createElement('div');
   title.textContent = feature?.properties?.Farm_name || '-';
   title.style.fontWeight = 'bold';
-  title.style.fontSize = '18px';
+  title.style.fontSize = '16px';
   title.style.textAlign = 'center';
-  title.style.marginBottom = '6px';
+  title.style.marginBottom = '8px';
+  title.style.color = 'var(--c-text-heading)';
+  title.style.paddingBottom = '8px';
+  title.style.borderBottom = '1px solid var(--c-border)';
   wrapper.appendChild(title);
 
   // Address
   const addressDiv = document.createElement('div');
   addressDiv.style.marginBottom = '4px';
+  addressDiv.style.fontSize = '13px';
+  addressDiv.style.color = 'var(--c-text-secondary)';
   const addressLabel = document.createElement('span');
   addressLabel.textContent = 'ที่อยู่ :';
-  addressLabel.style.fontWeight = 'bold';
+  addressLabel.style.fontWeight = '600';
+  addressLabel.style.color = 'var(--c-text)';
   addressDiv.appendChild(addressLabel);
   addressDiv.appendChild(document.createTextNode(' ' + (feature?.properties?.Address || '-')));
   wrapper.appendChild(addressDiv);
@@ -39,17 +45,20 @@ function buildPopupContent(feature, lat, lng, onViewDetail) {
   // ปุ่มดูข้อมูล
   const viewBtn = document.createElement('button');
   viewBtn.textContent = 'ดูข้อมูล';
-  viewBtn.style.display = 'inline-block';
-  viewBtn.style.background = '#16a34a';
-  viewBtn.style.color = '#fff';
-  viewBtn.style.padding = '6px 16px';
+  viewBtn.style.display = 'inline-flex';
+  viewBtn.style.alignItems = 'center';
+  viewBtn.style.background = 'var(--c-green-bg)';
+  viewBtn.style.color = 'var(--c-green)';
+  viewBtn.style.padding = '6px 14px';
   viewBtn.style.borderRadius = '8px';
-  viewBtn.style.border = 'none';
+  viewBtn.style.border = '1px solid var(--c-green-border)';
   viewBtn.style.fontWeight = '600';
-  viewBtn.style.fontSize = '14px';
-  viewBtn.style.marginTop = '4px';
+  viewBtn.style.fontSize = '13px';
   viewBtn.style.cursor = 'pointer';
   viewBtn.style.fontFamily = 'Sarabun-Medium, sans-serif';
+  viewBtn.style.transition = 'all 0.2s';
+  viewBtn.addEventListener('mouseenter', () => { viewBtn.style.background = 'var(--c-green-bg-hover)'; });
+  viewBtn.addEventListener('mouseleave', () => { viewBtn.style.background = 'var(--c-green-bg)'; });
   viewBtn.addEventListener('click', () => {
     if (onViewDetail) onViewDetail(feature);
   });
@@ -59,16 +68,21 @@ function buildPopupContent(feature, lat, lng, onViewDetail) {
   link.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
-  link.textContent = 'แสดงการนำทาง Google Map';
-  link.style.display = 'inline-block';
-  link.style.background = '#2563eb';
-  link.style.color = '#fff';
-  link.style.padding = '6px 16px';
+  link.textContent = 'นำทาง Google Map';
+  link.style.display = 'inline-flex';
+  link.style.alignItems = 'center';
+  link.style.background = 'var(--c-accent-bg)';
+  link.style.color = 'var(--c-accent-light)';
+  link.style.padding = '6px 14px';
   link.style.borderRadius = '8px';
+  link.style.border = '1px solid var(--c-accent-border)';
   link.style.textDecoration = 'none';
   link.style.fontWeight = '600';
-  link.style.fontSize = '14px';
-  link.style.marginTop = '4px';
+  link.style.fontSize = '13px';
+  link.style.fontFamily = 'Sarabun-Medium, sans-serif';
+  link.style.transition = 'all 0.2s';
+  link.addEventListener('mouseenter', () => { link.style.background = 'var(--c-accent-bg-hover)'; });
+  link.addEventListener('mouseleave', () => { link.style.background = 'var(--c-accent-bg)'; });
 
   actions.appendChild(link);
   wrapper.appendChild(actions);
