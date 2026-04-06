@@ -57,6 +57,11 @@
   --c-scrollbar-hover: rgba(148,163,184,0.35);
   --c-sidebar-header: rgba(148,163,184,0.8);
   --c-footer-text: rgba(148,163,184,0.5);
+  --c-toggle-start: #1e40af;
+  --c-toggle-end: #1d4ed8;
+  --c-toggle-hover-start: #1d4ed8;
+  --c-toggle-hover-end: #2563eb;
+  --c-toggle-text: #fff;
 }
 
 [data-theme="light"] {
@@ -116,6 +121,11 @@
   --c-scrollbar-hover: rgba(148,163,184,0.5);
   --c-sidebar-header: #64748b;
   --c-footer-text: rgba(100,116,139,0.6);
+  --c-toggle-start: #e2e8f0;
+  --c-toggle-end: #f1f5f9;
+  --c-toggle-hover-start: #d1d5db;
+  --c-toggle-hover-end: #e2e8f0;
+  --c-toggle-text: #1e293b;
 }
 
 /* ===== Global Styles ===== */

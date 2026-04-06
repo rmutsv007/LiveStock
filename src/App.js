@@ -14,6 +14,15 @@ import layers from './layers';
 import './MapOverrides.css';
 import './sarabun-font.css';
 
+const BASEMAPS = [
+  { id: 'osm',        label: 'OpenStreetMap',  url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' },
+  { id: 'carto-dark',  label: 'Dark',           url: 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png' },
+  { id: 'carto-light', label: 'Light',          url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' },
+  { id: 'carto-voyager', label: 'Voyager',      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png' },
+  { id: 'esri-satellite', label: 'Satellite',   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' },
+  { id: 'esri-topo',  label: 'Topo',            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}' },
+];
+
 function getFeatureViewTarget(feature) {
   if (!feature) {
     return null;
@@ -67,11 +76,15 @@ function MapInstanceBridge({ mapRef }) {
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [dashboardCollapsed, setDashboardCollapsed] = useState(false);
   const [points, setPoints] = useState([]);
   const [filteredPoints, setFilteredPoints] = useState([]);
   const searchValue = "";
   const [selectedLayerIds, setSelectedLayerIds] = useState([]);
   const [selectedFeature, setSelectedFeature] = useState(null);
+  const [basemapId, setBasemapId] = useState(() => localStorage.getItem('basemap') || 'osm');
+  const [basemapOpen, setBasemapOpen] = useState(false);
+  const basemapManualRef = useRef(false);
   const [mapCenter] = useState([7.4, 100.3]); // พิกัดสงขลา
   const [mapZoom] = useState(9);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
@@ -92,31 +105,56 @@ function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const toggleTheme = (e) => {
+  const toggleTheme = () => {
     const btn = toggleBtnRef.current;
     const rect = btn.getBoundingClientRect();
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;
 
-    // Capture current page as screenshot overlay
+    // Solid-color overlay with circular reveal
     const overlay = document.createElement('div');
     overlay.className = 'theme-reveal-overlay';
     overlay.style.setProperty('--reveal-x', `${x}px`);
     overlay.style.setProperty('--reveal-y', `${y}px`);
+    // Get the NEXT theme's background color
+    const nextTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nextTheme);
     overlay.style.background = getComputedStyle(document.documentElement).getPropertyValue('--c-bg-app');
+    // Revert temporarily
+    document.documentElement.setAttribute('data-theme', nextTheme === 'light' ? 'dark' : 'light');
 
-    // Clone the current page visuals into the overlay
-    const clone = document.getElementById('root').cloneNode(true);
-    clone.style.pointerEvents = 'none';
-    overlay.appendChild(clone);
     document.body.appendChild(overlay);
 
-    // Switch theme underneath
-    setTheme(t => t === 'dark' ? 'light' : 'dark');
+    // Switch theme after a brief moment so overlay is visible first
+    requestAnimationFrame(() => {
+      setTheme(t => t === 'dark' ? 'light' : 'dark');
+    });
 
     // Remove overlay after animation
     overlay.addEventListener('animationend', () => overlay.remove());
   };
+
+  // Basemap persistence
+  useEffect(() => {
+    localStorage.setItem('basemap', basemapId);
+  }, [basemapId]);
+
+  // Auto-switch basemap on theme change (only if user hasn't manually picked)
+  useEffect(() => {
+    if (!basemapManualRef.current) {
+      setBasemapId(theme === 'dark' ? 'carto-dark' : 'osm');
+    }
+  }, [theme]);
+
+  // Invalidate map size when dashboard or sidebar collapses/expands
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      mapRef.current?.invalidateSize();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [dashboardCollapsed, sidebarCollapsed]);
+
+  const selectedBasemap = BASEMAPS.find(b => b.id === basemapId) || BASEMAPS[0];
 
   // 2. ค้นหาข้อมูล
   useEffect(() => {
@@ -298,7 +336,75 @@ function App() {
               style={{ height: '100%', width: '100%' }}
             >
               <MapInstanceBridge mapRef={mapRef} />
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <TileLayer url={selectedBasemap.url} />
+
+              {/* Basemap Picker */}
+              <div style={{
+                position: 'absolute', top: 10, right: 10, zIndex: 1000,
+                fontFamily: 'Sarabun-Medium, sans-serif',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+              }}>
+                <button
+                  onClick={() => setBasemapOpen(v => !v)}
+                  style={{
+                    background: 'var(--c-bg-primary)',
+                    border: '1px solid var(--c-border)',
+                    borderRadius: 8,
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: 'var(--c-text)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    boxShadow: 'var(--c-shadow)',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+                    <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+                    <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+                    <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+                  </svg>
+                  {selectedBasemap.label}
+                </button>
+                {basemapOpen && (
+                  <div style={{
+                    marginTop: 4,
+                    background: 'var(--c-bg-primary)',
+                    border: '1px solid var(--c-border)',
+                    borderRadius: 8,
+                    padding: 4,
+                    boxShadow: 'var(--c-shadow-lg)',
+                    minWidth: 140,
+                  }}>
+                    {BASEMAPS.map(b => (
+                      <div
+                        key={b.id}
+                        onClick={() => { basemapManualRef.current = true; setBasemapId(b.id); setBasemapOpen(false); }}
+                        style={{
+                          padding: '8px 12px',
+                          fontSize: 12,
+                          fontWeight: b.id === basemapId ? 700 : 500,
+                          color: b.id === basemapId ? 'var(--c-accent-light)' : 'var(--c-text)',
+                          background: b.id === basemapId ? 'var(--c-accent-bg)' : 'transparent',
+                          borderRadius: 6,
+                          cursor: 'pointer',
+                          transition: 'background 0.15s',
+                        }}
+                        onMouseOver={e => { if (b.id !== basemapId) e.currentTarget.style.background = 'var(--c-bg-hover)'; }}
+                        onMouseOut={e => { if (b.id !== basemapId) e.currentTarget.style.background = 'transparent'; }}
+                      >
+                        {b.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               
               {/* WMS Layers */}
               {layers.flatMap(cat => cat.items || [cat])
@@ -327,21 +433,56 @@ function App() {
         </section>
 
         {/* TABLE / DETAIL (ขวา) */}
-        <section style={{ flex: 1.5, height: '100%', minWidth: '700px', padding: '16px 16px 16px 0' }}>
-          {selectedFeature ? (
-            <FeatureDetail
-              feature={selectedFeature}
-              onBack={() => setSelectedFeature(null)}
-              onZoomToFeature={handleZoomToFeature}
-            />
-          ) : (
-            <DashboardTable
-              points={filteredPoints}
-              onSelectFeature={feature => {
-                setSelectedFeature(feature);
-                handleZoomToFeature(feature);
-              }}
-            />
+        <section style={{
+          display: 'flex',
+          flex: dashboardCollapsed ? 'none' : '0 0 45%',
+          width: dashboardCollapsed ? 24 : '100%',
+          height: '100%',
+          transition: 'flex 0.25s ease, width 0.25s ease',
+          overflow: 'hidden',
+        }}>
+          {/* Toggle button */}
+          <button
+            onClick={() => setDashboardCollapsed(v => !v)}
+            style={{
+              width: 24,
+              minWidth: 24,
+              height: '100%',
+              background: 'var(--c-bg-secondary)',
+              border: 'none',
+              borderLeft: '1px solid var(--c-border)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--c-text-secondary)',
+              fontSize: 14,
+              padding: 0,
+              transition: 'all 0.25s ease',
+              flexShrink: 0,
+            }}
+            aria-label={dashboardCollapsed ? 'ขยายแดชบอร์ด' : 'ย่อแดชบอร์ด'}
+          >
+            {dashboardCollapsed ? '‹' : '›'}
+          </button>
+          {!dashboardCollapsed && (
+            <div style={{ flex: 1, width: '100%', padding: '16px 16px 16px 8px', height: '100%' }}>
+              {selectedFeature ? (
+                <FeatureDetail
+                  feature={selectedFeature}
+                  onBack={() => setSelectedFeature(null)}
+                  onZoomToFeature={handleZoomToFeature}
+                />
+              ) : (
+                <DashboardTable
+                  points={filteredPoints}
+                  onSelectFeature={feature => {
+                    setSelectedFeature(feature);
+                    handleZoomToFeature(feature);
+                  }}
+                />
+              )}
+            </div>
           )}
         </section>
 

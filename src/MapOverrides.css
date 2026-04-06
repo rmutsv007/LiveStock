@@ -18,6 +18,8 @@
 .leaflet-control-zoom {
   bottom: 0px !important;
   top: auto !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Map Controls - Theme Aware */

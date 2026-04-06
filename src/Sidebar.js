@@ -129,7 +129,7 @@ const Sidebar = ({ onLayerChange, collapsed, onCollapseChange }) => {
       {/* Footer */}
       {!collapsed && (
         <div className="sidebar-footer">
-          <p className="sidebar-footer-text">กรมปศุสัตว์ จ.สงขลา</p>
+          <p className="sidebar-footer-text">มหาวิทยาลัยเทคโนโลยีราชมงคลศรีวิชัย</p>
         </div>
       )}
     </div>
