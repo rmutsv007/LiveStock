@@ -1,0 +1,58 @@
+/* Professional Sidebar Styling */
+.sidebar-container {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 280px;
+  height: calc(100vh - 64px);
+  background: #fff;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e5e7eb;
+}
+
+.sidebar-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 20px;
+  letter-spacing: -0.3px;
+}
+
+.sidebar-content {
+  flex: 1;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.layer-item {
+  transition: all 0.25s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.layer-item:hover {
+  background: #eff6ff;
+  border-left: 4px solid #3b82f6;
+  padding-left: 14px;
+}
