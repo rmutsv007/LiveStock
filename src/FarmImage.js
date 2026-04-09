@@ -10,6 +10,7 @@ const FarmImage = ({ farmName, authToken }) => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
+  const [fullscreen, setFullscreen] = useState(false);
 
   // ดึงรูปฟาร์มจาก server
   const fetchImage = useCallback(async () => {
@@ -120,11 +121,49 @@ const FarmImage = ({ farmName, authToken }) => {
           <img
             src={imageUrl}
             alt={farmName}
+            onClick={() => setFullscreen(true)}
             style={{
               width: '100%', maxHeight: 240, objectFit: 'cover',
-              display: 'block',
+              display: 'block', cursor: 'pointer',
             }}
           />
+
+          {/* Lightbox เต็มจอ */}
+          {fullscreen && (
+            <div
+              onClick={() => setFullscreen(false)}
+              style={{
+                position: 'fixed', inset: 0, zIndex: 10000,
+                background: 'rgba(0,0,0,0.85)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'zoom-out',
+              }}
+            >
+              <img
+                src={imageUrl}
+                alt={farmName}
+                onClick={e => e.stopPropagation()}
+                style={{
+                  maxWidth: '90vw', maxHeight: '90vh',
+                  objectFit: 'contain', borderRadius: 8,
+                  cursor: 'default',
+                }}
+              />
+              <button
+                onClick={() => setFullscreen(false)}
+                style={{
+                  position: 'absolute', top: 20, right: 20,
+                  background: 'rgba(255,255,255,0.15)', color: '#fff',
+                  border: 'none', borderRadius: 8, width: 40, height: 40,
+                  fontSize: 22, cursor: 'pointer', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  lineHeight: 1, padding: 0,
+                }}
+              >
+                &#10005;
+              </button>
+            </div>
+          )}
           {/* ปุ่มลบ (เฉพาะเมื่อ login) */}
           {authToken && (
             <button

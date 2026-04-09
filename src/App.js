@@ -392,8 +392,6 @@ function App() {
           ref={toggleBtnRef}
           onClick={toggleTheme}
           style={{
-            position: 'absolute',
-            right: 16,
             background: 'var(--c-bg-icon)',
             border: '1px solid var(--c-border)',
             borderRadius: 8,
