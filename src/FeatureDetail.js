@@ -6,6 +6,7 @@
 
 import React from 'react';
 import layers from './layers'; // รายการชั้นข้อมูลสำหรับแสดงไอคอนประเภท
+import FarmImage from './FarmImage'; // คอมโพเนนต์แสดง/อัปโหลดรูปฟาร์ม
 
 /**
  * FeatureDetail — หน้าแสดงรายละเอียดฟาร์ม
@@ -13,7 +14,7 @@ import layers from './layers'; // รายการชั้นข้อมู�
  * @param {Function} onBack - callback กลับไปหน้าตาราง
  * @param {Function} onZoomToFeature - callback ซูมแผนที่ไปยังตำแหน่งฟาร์ม
  */
-const FeatureDetail = ({ feature, onBack, onZoomToFeature }) => {
+const FeatureDetail = ({ feature, onBack, onZoomToFeature, authToken }) => {
   // ถ้าไม่มี feature ให้ไม่ render อะไร
   if (!feature) return null;
   const p = feature.properties || {}; // ดึง properties ของ feature
@@ -221,6 +222,11 @@ const FeatureDetail = ({ feature, onBack, onZoomToFeature }) => {
               นำทาง Google Map
             </a>
           </div>
+        )}
+
+        {/* === รูปภาพฟาร์ม === */}
+        {p.Farm_name && (
+          <FarmImage farmName={p.Farm_name} authToken={authToken} />
         )}
       </div>
     </div>

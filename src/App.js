@@ -27,6 +27,7 @@ import 'leaflet/dist/leaflet.css';
 import DashboardTable from './DashboardTable';   // ตารางข้อมูลปศุสัตว์
 import FeatureDetail from './FeatureDetail';     // หน้ารายละเอียดฟาร์ม
 import Sidebar from './Sidebar';                 // แถบเมนูเลือกชั้นข้อมูล (ซ้าย)
+import Login from './Login';                     // หน้าเข้าสู่ระบบผู้ดูแล
 import layers from './layers';                   // รายการชั้นข้อมูลทั้งหมด
 
 // === นำเข้า CSS เพิ่มเติม ===
@@ -140,6 +141,9 @@ function App() {
   const [mapCenter] = useState([7.4, 100.3]);                           // พิกัดกึ่งกลางแผนที่ (จ.สงขลา)
   const [mapZoom] = useState(9);                                         // ระดับ zoom เริ่มต้นของแผนที่
   const [theme, setTheme] = useState('light');                           // ธีม: 'light' หรือ 'dark'
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem('authToken') || null);  // JWT token
+  const [authUser, setAuthUser] = useState(() => localStorage.getItem('authUser') || null);     // ชื่อผู้ใช้
+  const [showLogin, setShowLogin] = useState(false);                     // แสดง modal login
   
   const toggleBtnRef = useRef();  // ref ของปุ่มสลับธีม (ใช้คำนวณตำแหน่ง animation)
   const mapRef = useRef();        // ref ของ Leaflet map instance
@@ -344,7 +348,47 @@ function App() {
           ระบบฐานข้อมูลเกษตรกรผู้เลี้ยงปศุสัตว์จังหวัดสงขลา
         </h1>
         {/* ปุ่มสลับธีม (มืด/สว่าง) — อยู่ขวาสุด */}
-        <button
+        <div style={{ position: 'absolute', right: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* ปุ่มเข้าสู่ระบบ / แสดงชื่อผู้ใช้ */}
+          {authToken ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 12, color: 'var(--c-text-secondary)', fontFamily: 'Sarabun-Medium' }}>
+                {authUser}
+              </span>
+              <button
+                onClick={() => {
+                  localStorage.removeItem('authToken');
+                  localStorage.removeItem('authUser');
+                  setAuthToken(null);
+                  setAuthUser(null);
+                }}
+                style={{
+                  background: 'var(--c-bg-icon)', border: '1px solid var(--c-border)',
+                  borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600,
+                  color: 'var(--c-text-secondary)', cursor: 'pointer', fontFamily: 'Sarabun-Medium',
+                }}
+              >
+                ออกจากระบบ
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowLogin(true)}
+              style={{
+                background: 'var(--c-bg-icon)', border: '1px solid var(--c-border)',
+                borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600,
+                color: 'var(--c-accent-light)', cursor: 'pointer', fontFamily: 'Sarabun-Medium',
+                display: 'flex', alignItems: 'center', gap: 4,
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <circle cx="7" cy="4.5" r="2.5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+                <path d="M2 12c0-2.5 2.2-4 5-4s5 1.5 5 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+              </svg>
+              เข้าสู่ระบบ
+            </button>
+          )}
+          <button
           ref={toggleBtnRef}
           onClick={toggleTheme}
           style={{
@@ -376,7 +420,20 @@ function App() {
             </svg>
           )}
         </button>
+        </div>
       </header>
+
+      {/* Login Modal */}
+      {showLogin && (
+        <Login
+          onLogin={({ token, username }) => {
+            setAuthToken(token);
+            setAuthUser(username);
+            setShowLogin(false);
+          }}
+          onClose={() => setShowLogin(false)}
+        />
+      )}
 
       {/* ==================== MAIN CONTENT (เนื้อหาหลัก) ==================== */}
       {/* Flex row: Sidebar (ซ้าย) | Map (กลาง) | Dashboard (ขวา) */}
@@ -577,6 +634,7 @@ function App() {
                   feature={selectedFeature}                 // ข้อมูล feature ที่เลือก
                   onBack={() => setSelectedFeature(null)}   // กลับไปหน้าตาราง
                   onZoomToFeature={handleZoomToFeature}     // ซูมไปตำแหน่งฟาร์ม
+                  authToken={authToken}                     // token สำหรับอัปโหลดรูป
                 />
               ) : (
                 <DashboardTable

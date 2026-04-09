@@ -1,70 +1,70 @@
-# เริ่มต้นใช้งาน Create React App
+# Getting Started with Create React App
 
-โปรเจกต์นี้สร้างด้วย [Create React App](https://github.com/facebook/create-react-app)
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## คำสั่งที่ใช้งานได้
+## Available Scripts
 
-ในโฟลเดอร์โปรเจกต์ สามารถรันคำสั่งต่อไปนี้:
+In the project directory, you can run:
 
 ### `npm start`
 
-รันแอปในโหมด development\
-เปิด [http://localhost:3000](http://localhost:3000) เพื่อดูในเบราว์เซอร์
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-หน้าเว็บจะรีโหลดอัตโนมัติเมื่อมีการแก้ไขโค้ด\
-และจะแสดง lint errors ใน console (ถ้ามี)
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
 ### `npm test`
 
-รัน test runner ในโหมด interactive watch\
-ดูรายละเอียดเพิ่มเติมที่ [การรันเทสต์](https://facebook.github.io/create-react-app/docs/running-tests)
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `npm run build`
 
-สร้าง build สำหรับ production ไว้ในโฟลเดอร์ `build`\
-จะ bundle React ในโหมด production และปรับแต่งประสิทธิภาพให้ดีที่สุด
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-ไฟล์จะถูก minify และชื่อไฟล์จะมี hash\
-แอปพร้อมสำหรับการ deploy แล้ว!
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-ดูรายละเอียดเพิ่มเติมที่ [การ deploy](https://facebook.github.io/create-react-app/docs/deployment)
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 ### `npm run eject`
 
-**หมายเหตุ: คำสั่งนี้ย้อนกลับไม่ได้! เมื่อ `eject` แล้วจะกลับคืนไม่ได้!**
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-หากไม่พอใจกับ build tool และการตั้งค่าต่างๆ สามารถ `eject` ได้ตลอดเวลา คำสั่งนี้จะลบ build dependency ออกจากโปรเจกต์
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-แทนที่จะเป็นเช่นนั้น จะคัดลอกไฟล์ config และ dependencies ทั้งหมด (webpack, Babel, ESLint ฯลฯ) เข้ามาในโปรเจกต์โดยตรง เพื่อให้ควบคุมได้เต็มที่ คำสั่งอื่นๆ ยกเว้น `eject` จะยังทำงานได้ปกติ
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-ไม่จำเป็นต้องใช้ `eject` เสมอไป ชุดฟีเจอร์ที่มีอยู่เพียงพอสำหรับโปรเจกต์ขนาดเล็กถึงกลาง
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## เรียนรู้เพิ่มเติม
+## Learn More
 
-ดูเพิ่มเติมได้ที่ [เอกสาร Create React App](https://facebook.github.io/create-react-app/docs/getting-started)
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-เรียนรู้ React ได้ที่ [เอกสาร React](https://reactjs.org/)
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-### การแบ่งโค้ด (Code Splitting)
+### Code Splitting
 
-ดูรายละเอียดที่: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### การวิเคราะห์ขนาด Bundle
+### Analyzing the Bundle Size
 
-ดูรายละเอียดที่: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### การสร้าง Progressive Web App
+### Making a Progressive Web App
 
-ดูรายละเอียดที่: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-### การตั้งค่าขั้นสูง
+### Advanced Configuration
 
-ดูรายละเอียดที่: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### การ Deploy
+### Deployment
 
-ดูรายละเอียดที่: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `npm run build` minify ไม่สำเร็จ
+### `npm run build` fails to minify
 
-ดูรายละเอียดที่: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

@@ -1,0 +1,182 @@
+/**
+ * server.js — Backend Express สำหรับจัดการรูปภาพฟาร์ม
+ * - POST /api/auth/login — เข้าสู่ระบบ (JWT)
+ * - GET  /api/images — รายชื่อรูปฟาร์มทั้งหมด
+ * - POST /api/images/:farmName — อัปโหลดรูปฟาร์ม (ต้อง login)
+ * - DELETE /api/images/:farmName — ลบรูปฟาร์ม (ต้อง login)
+ * - Static: /uploads/farm-images/* — เข้าถึงรูปโดยตรง
+ */
+
+const express = require('express');
+const cors = require('cors');
+const multer = require('multer');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
+const path = require('path');
+const fs = require('fs');
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret-in-production';
+const UPLOADS_DIR = path.join(__dirname, 'uploads', 'farm-images');
+const USERS_FILE = path.join(__dirname, 'data', 'users.json');
+
+// สร้างโฟลเดอร์ถ้ายังไม่มี
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+fs.mkdirSync(path.dirname(USERS_FILE), { recursive: true });
+
+// === Middleware ===
+app.use(cors());
+app.use(express.json());
+
+// Static serve รูปภาพ
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// === Rate limit สำหรับ login ===
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 นาที
+  max: 10, // จำกัด 10 ครั้งต่อ IP
+  message: { error: 'คำขอเข้าสู่ระบบมากเกินไป กรุณารอสักครู่' },
+});
+
+// === Helper: อ่าน/เขียนไฟล์ users ===
+function readUsers() {
+  if (!fs.existsSync(USERS_FILE)) return [];
+  return JSON.parse(fs.readFileSync(USERS_FILE, 'utf-8'));
+}
+
+// === Middleware: ตรวจสอบ JWT ===
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'กรุณาเข้าสู่ระบบ' });
+  }
+  try {
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch {
+    return res.status(401).json({ error: 'Token ไม่ถูกต้องหรือหมดอายุ' });
+  }
+}
+
+// === Multer config: จำกัดประเภทไฟล์และขนาด ===
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, UPLOADS_DIR),
+    filename: (req, file, cb) => {
+      // ใช้ชื่อฟาร์ม + นามสกุลไฟล์ต้นฉบับ
+      const farmName = req.params.farmName;
+      const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+      cb(null, farmName + ext);
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 }, // จำกัด 10MB
+  fileFilter: (req, file, cb) => {
+    if (ALLOWED_TYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('อนุญาตเฉพาะไฟล์ JPG, PNG, WEBP'));
+    }
+  },
+});
+
+// ===========================
+// Routes
+// ===========================
+
+// POST /api/auth/login — เข้าสู่ระบบ
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน' });
+  }
+
+  const users = readUsers();
+  const user = users.find(u => u.username === username);
+  if (!user) {
+    return res.status(401).json({ error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
+  }
+
+  const valid = await bcrypt.compare(password, user.passwordHash);
+  if (!valid) {
+    return res.status(401).json({ error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
+  }
+
+  const token = jwt.sign({ username: user.username }, JWT_SECRET, { expiresIn: '8h' });
+  res.json({ token, username: user.username });
+});
+
+// GET /api/images — รายชื่อรูปฟาร์มทั้งหมด
+app.get('/api/images', (req, res) => {
+  if (!fs.existsSync(UPLOADS_DIR)) return res.json([]);
+
+  const files = fs.readdirSync(UPLOADS_DIR);
+  const images = files
+    .filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f))
+    .map(f => {
+      const farmName = f.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+      return { farmName, filename: f, url: `/uploads/farm-images/${encodeURIComponent(f)}` };
+    });
+  res.json(images);
+});
+
+// POST /api/images/:farmName — อัปโหลดรูปฟาร์ม
+app.post('/api/images/:farmName', authMiddleware, (req, res) => {
+  // ป้องกัน path traversal
+  const farmName = path.basename(req.params.farmName);
+  if (!farmName || farmName.includes('..')) {
+    return res.status(400).json({ error: 'ชื่อฟาร์มไม่ถูกต้อง' });
+  }
+  req.params.farmName = farmName;
+
+  // ลบรูปเก่าของฟาร์มนี้ก่อน (ถ้ามี)
+  const existingFiles = fs.readdirSync(UPLOADS_DIR)
+    .filter(f => f.replace(/\.(jpg|jpeg|png|webp)$/i, '') === farmName);
+  existingFiles.forEach(f => {
+    fs.unlinkSync(path.join(UPLOADS_DIR, f));
+  });
+
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: 'ไม่พบไฟล์รูปภาพ' });
+    }
+    res.json({
+      message: 'อัปโหลดสำเร็จ',
+      farmName,
+      url: `/uploads/farm-images/${encodeURIComponent(req.file.filename)}`,
+    });
+  });
+});
+
+// DELETE /api/images/:farmName — ลบรูปฟาร์ม
+app.delete('/api/images/:farmName', authMiddleware, (req, res) => {
+  const farmName = path.basename(req.params.farmName);
+  if (!farmName || farmName.includes('..')) {
+    return res.status(400).json({ error: 'ชื่อฟาร์มไม่ถูกต้อง' });
+  }
+
+  const files = fs.readdirSync(UPLOADS_DIR)
+    .filter(f => f.replace(/\.(jpg|jpeg|png|webp)$/i, '') === farmName);
+
+  if (files.length === 0) {
+    return res.status(404).json({ error: 'ไม่พบรูปภาพของฟาร์มนี้' });
+  }
+
+  files.forEach(f => {
+    fs.unlinkSync(path.join(UPLOADS_DIR, f));
+  });
+  res.json({ message: 'ลบรูปภาพสำเร็จ' });
+});
+
+// === Start Server ===
+app.listen(PORT, () => {
+  console.log(`Farm Image Server running on http://localhost:${PORT}`);
+  console.log(`รูปภาพเก็บที่: ${UPLOADS_DIR}`);
+});
