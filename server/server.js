@@ -62,16 +62,23 @@ function authMiddleware(req, res, next) {
   }
 }
 
-// === Multer config: จำกัดประเภทไฟล์และขนาด ===
+// === Config ===
+const MAX_IMAGES_PER_FARM = 24;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+// === Multer config: จำกัดประเภทไฟล์และขนาด ===
 const upload = multer({
   storage: multer.diskStorage({
-    destination: (req, file, cb) => cb(null, UPLOADS_DIR),
+    destination: (req, file, cb) => {
+      // เก็บในโฟลเดอร์ย่อยชื่อฟาร์ม
+      const farmDir = path.join(UPLOADS_DIR, req.params.farmName);
+      fs.mkdirSync(farmDir, { recursive: true });
+      cb(null, farmDir);
+    },
     filename: (req, file, cb) => {
-      // ใช้ชื่อฟาร์ม + นามสกุลไฟล์ต้นฉบับ
-      const farmName = req.params.farmName;
+      // ตั้งชื่อไฟล์: timestamp + นามสกุล
       const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
-      cb(null, farmName + ext);
+      cb(null, `${Date.now()}${ext}`);
     },
   }),
   limits: { fileSize: 10 * 1024 * 1024 }, // จำกัด 10MB
@@ -83,6 +90,18 @@ const upload = multer({
     }
   },
 });
+
+// Helper: ดึงรูปทั้งหมดของฟาร์ม
+function getFarmImages(farmName) {
+  const farmDir = path.join(UPLOADS_DIR, farmName);
+  if (!fs.existsSync(farmDir)) return [];
+  return fs.readdirSync(farmDir)
+    .filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f))
+    .map(f => ({
+      filename: f,
+      url: `/uploads/farm-images/${encodeURIComponent(farmName)}/${encodeURIComponent(f)}`,
+    }));
+}
 
 // ===========================
 // Routes
@@ -110,21 +129,22 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
   res.json({ token, username: user.username });
 });
 
-// GET /api/images — รายชื่อรูปฟาร์มทั้งหมด
+// GET /api/images — รายชื่อรูปฟาร์มทั้งหมด (จัดกลุ่มตามฟาร์ม)
 app.get('/api/images', (req, res) => {
-  if (!fs.existsSync(UPLOADS_DIR)) return res.json([]);
+  if (!fs.existsSync(UPLOADS_DIR)) return res.json({});
 
-  const files = fs.readdirSync(UPLOADS_DIR);
-  const images = files
-    .filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f))
-    .map(f => {
-      const farmName = f.replace(/\.(jpg|jpeg|png|webp)$/i, '');
-      return { farmName, filename: f, url: `/uploads/farm-images/${encodeURIComponent(f)}` };
-    });
-  res.json(images);
+  const entries = fs.readdirSync(UPLOADS_DIR, { withFileTypes: true });
+  const result = {};
+  entries.forEach(entry => {
+    if (entry.isDirectory()) {
+      const images = getFarmImages(entry.name);
+      if (images.length > 0) result[entry.name] = images;
+    }
+  });
+  res.json(result);
 });
 
-// POST /api/images/:farmName — อัปโหลดรูปฟาร์ม
+// POST /api/images/:farmName — อัปโหลดรูปฟาร์ม (สูงสุด 24 รูป)
 app.post('/api/images/:farmName', authMiddleware, (req, res) => {
   // ป้องกัน path traversal
   const farmName = path.basename(req.params.farmName);
@@ -133,12 +153,11 @@ app.post('/api/images/:farmName', authMiddleware, (req, res) => {
   }
   req.params.farmName = farmName;
 
-  // ลบรูปเก่าของฟาร์มนี้ก่อน (ถ้ามี)
-  const existingFiles = fs.readdirSync(UPLOADS_DIR)
-    .filter(f => f.replace(/\.(jpg|jpeg|png|webp)$/i, '') === farmName);
-  existingFiles.forEach(f => {
-    fs.unlinkSync(path.join(UPLOADS_DIR, f));
-  });
+  // ตรวจจำนวนรูปที่มีอยู่
+  const existing = getFarmImages(farmName);
+  if (existing.length >= MAX_IMAGES_PER_FARM) {
+    return res.status(400).json({ error: `อัปโหลดได้สูงสุด ${MAX_IMAGES_PER_FARM} รูปต่อฟาร์ม` });
+  }
 
   upload.single('image')(req, res, (err) => {
     if (err) {
@@ -150,29 +169,44 @@ app.post('/api/images/:farmName', authMiddleware, (req, res) => {
     res.json({
       message: 'อัปโหลดสำเร็จ',
       farmName,
-      url: `/uploads/farm-images/${encodeURIComponent(req.file.filename)}`,
+      url: `/uploads/farm-images/${encodeURIComponent(farmName)}/${encodeURIComponent(req.file.filename)}`,
+      count: existing.length + 1,
+      max: MAX_IMAGES_PER_FARM,
     });
   });
 });
 
-// DELETE /api/images/:farmName — ลบรูปฟาร์ม
+// DELETE /api/images/:farmName/:filename — ลบรูปทีละไฟล์
+app.delete('/api/images/:farmName/:filename', authMiddleware, (req, res) => {
+  const farmName = path.basename(req.params.farmName);
+  const filename = path.basename(req.params.filename);
+  if (!farmName || !filename || farmName.includes('..') || filename.includes('..')) {
+    return res.status(400).json({ error: 'ข้อมูลไม่ถูกต้อง' });
+  }
+
+  const filePath = path.join(UPLOADS_DIR, farmName, filename);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'ไม่พบรูปภาพนี้' });
+  }
+
+  fs.unlinkSync(filePath);
+  res.json({ message: 'ลบรูปภาพสำเร็จ' });
+});
+
+// DELETE /api/images/:farmName — ลบรูปทั้งหมดของฟาร์ม
 app.delete('/api/images/:farmName', authMiddleware, (req, res) => {
   const farmName = path.basename(req.params.farmName);
   if (!farmName || farmName.includes('..')) {
     return res.status(400).json({ error: 'ชื่อฟาร์มไม่ถูกต้อง' });
   }
 
-  const files = fs.readdirSync(UPLOADS_DIR)
-    .filter(f => f.replace(/\.(jpg|jpeg|png|webp)$/i, '') === farmName);
-
-  if (files.length === 0) {
+  const farmDir = path.join(UPLOADS_DIR, farmName);
+  if (!fs.existsSync(farmDir)) {
     return res.status(404).json({ error: 'ไม่พบรูปภาพของฟาร์มนี้' });
   }
 
-  files.forEach(f => {
-    fs.unlinkSync(path.join(UPLOADS_DIR, f));
-  });
-  res.json({ message: 'ลบรูปภาพสำเร็จ' });
+  fs.rmSync(farmDir, { recursive: true });
+  res.json({ message: 'ลบรูปภาพทั้งหมดสำเร็จ' });
 });
 
 // === Start Server ===
