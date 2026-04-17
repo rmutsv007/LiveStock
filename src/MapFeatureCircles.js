@@ -119,7 +119,7 @@ function buildPopupContent(feature, lat, lng, onViewDetail) {
  * @param {number} fallbackKey - key สำรอง (index)
  * @returns {string} unique key
  */
-function getFeatureKey(feature, fallbackKey) {
+export function getFeatureKey(feature, fallbackKey) {
   // ใช้ feature.id ถ้ามี
   if (feature?.id != null) {
     return String(feature.id);
@@ -184,31 +184,32 @@ export function MapFeatureCircle({ feature, featureKey, onViewDetail }) {
    * handleClick — จัดการเมื่อคลิก Circle
    * ลบ popup เก่า แล้วสร้าง popup ใหม่
    */
-  const handleClick = event => {
-    event.originalEvent?.stopPropagation?.(); // ป้องกัน event bubble
+    const handleClick = event => {
+      event.originalEvent?.stopPropagation?.(); // ป้องกัน event bubble
 
-    // ลบ popup เก่า (ถ้ามี)
-    if (popupRef.current) {
-      map.removeLayer(popupRef.current);
-      popupRef.current = null;
-    }
+      // ลบ popup เก่า (ถ้ามี)
+      if (popupRef.current) {
+        map.removeLayer(popupRef.current);
+        popupRef.current = null;
+      }
 
-    // สร้าง popup ใหม่ด้วย Leaflet API
-    const popup = L.popup({
-      autoClose: true,       // ปิดอัตโนมัติเมื่อเปิด popup อื่น
-      closeOnClick: false,   // ไม่ปิดเมื่อคลิกแผนที่
-      autoPan: true,         // เลื่อนแผนที่ให้ popup อยู่ในมุมมอง
-      offset: [0, -8],       // เลื่อน popup ขึ้น 8px
-    })
-      .setLatLng(center)                                         // ตั้งตำแหน่ง popup
-      .setContent(buildPopupContent(feature, lat, lng, onViewDetail)); // ตั้งเนื้อหา popup
+      // สร้าง popup ใหม่ด้วย Leaflet API
+      const popup = L.popup({
+        autoClose: true,       // ปิดอัตโนมัติเมื่อเปิด popup อื่น
+        closeOnClick: false,   // ไม่ปิดเมื่อคลิกแผนที่
+        autoPan: true,         // เลื่อนแผนที่ให้ popup อยู่ในมุมมอง
+        offset: [0, -8],       // เลื่อน popup ขึ้น 8px
+      })
+        .setLatLng(center)                                         // ตั้งตำแหน่ง popup
+        .setContent(buildPopupContent(feature, lat, lng, onViewDetail)); // ตั้งเนื้อหา popup
 
-    popupRef.current = popup; // เก็บ reference
-    popup.openOn(map);        // เปิด popup บนแผนที่
-  };
+      popupRef.current = popup; // เก็บ reference
+      popup.openOn(map);        // เปิด popup บนแผนที่
+    };
 
   return (
     // วาด Circle บนแผนที่
+    <>
     <Circle
       center={center}
       radius={radius}
@@ -223,6 +224,7 @@ export function MapFeatureCircle({ feature, featureKey, onViewDetail }) {
         {feature.properties?.Farm_name || '-'}
       </Tooltip>
     </Circle>
+    </>
   );
 }
 

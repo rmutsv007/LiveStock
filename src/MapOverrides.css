@@ -128,3 +128,65 @@
   stroke: #f8717100 !important; /* โปร่งใส */
   stroke-width: 0 !important;
 }
+
+/* ยกเว้น highlight ring — ต้องแสดง stroke */
+.leaflet-interactive.highlight-pulse-ring {
+  stroke: #3b82f6 !important;
+  stroke-width: 3 !important;
+}
+
+/* === Highlight Pulse Ring — วงกลมกระพริบบอกตำแหน่งที่กำลังดู (HTML-based) === */
+.highlight-pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+}
+
+.highlight-pulse-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+  animation: highlight-pulse 1.8s ease-in-out infinite;
+  box-sizing: border-box;
+}
+
+.highlight-label {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #3b82f6;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Sarabun-Medium', sans-serif;
+  padding: 2px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+  letter-spacing: 0.3px;
+}
+
+@keyframes highlight-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

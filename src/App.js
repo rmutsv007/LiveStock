@@ -147,6 +147,49 @@ function App() {
   
   const toggleBtnRef = useRef();  // ref ของปุ่มสลับธีม (ใช้คำนวณตำแหน่ง animation)
   const mapRef = useRef();        // ref ของ Leaflet map instance
+  const highlightMarkerRef = useRef(null); // ref ของ highlight marker (จัดการ imperative ไม่ผ่าน React)
+
+  /**
+   * showHighlight — แสดงวงกลม highlight ที่ตำแหน่งที่กำหนด
+   * จัดการ Leaflet marker โดยตรง ไม่ผ่าน React lifecycle
+   */
+  const showHighlight = (latLng) => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    // สร้าง marker ครั้งแรก
+    if (!highlightMarkerRef.current) {
+      const icon = L.divIcon({
+        className: '',
+        html: `<div class="highlight-pulse-ring"><div class="highlight-pulse-inner"></div><div class="highlight-label">กำลังดู</div></div>`,
+        iconSize: [80, 80],
+        iconAnchor: [40, 40],
+      });
+      highlightMarkerRef.current = L.marker([0, 0], {
+        icon,
+        interactive: false,
+        zIndexOffset: 1000,
+      });
+      highlightMarkerRef.current.addTo(map);
+    }
+
+    // ย้ายตำแหน่งและแสดง
+    highlightMarkerRef.current.setLatLng(latLng);
+    highlightMarkerRef.current.setOpacity(1);
+    const el = highlightMarkerRef.current.getElement();
+    if (el) el.style.display = '';
+  };
+
+  /**
+   * hideHighlight — ซ่อนวงกลม highlight
+   */
+  const hideHighlight = () => {
+    if (highlightMarkerRef.current) {
+      highlightMarkerRef.current.setOpacity(0);
+      const el = highlightMarkerRef.current.getElement();
+      if (el) el.style.display = 'none';
+    }
+  };
 
   // === Effect: ปรับแต่ง body ให้เต็มหน้าจอ ===
   useEffect(() => {
@@ -287,24 +330,38 @@ function App() {
       return; // ถ้าไม่มีตำแหน่งหรือไม่มี map instance ให้หยุด
     }
 
-    requestAnimationFrame(() => {
-      mapRef.current.invalidateSize(); // อัปเดตขนาด map ก่อนซูม
-
-      // ถ้ามี bounds (polygon/line) ให้ fitBounds
-      if (target.bounds) {
+    // ถ้ามี bounds (polygon/line) ให้ fitBounds
+    if (target.bounds) {
+      const currentBounds = mapRef.current.getBounds();
+      const isSameBounds = currentBounds && currentBounds.contains(target.bounds) && target.bounds.contains(currentBounds);
+      if (!isSameBounds) {
         mapRef.current.fitBounds(target.bounds, {
           padding: [40, 40],  // เว้นขอบ 40px
           maxZoom: 15,        // zoom สูงสุด
         });
-        return;
       }
+      return;
+    }
 
-      // ถ้าเป็นจุดเดียว ให้ setView ไปยังตำแหน่งนั้น
-      mapRef.current.setView(target.center, Math.max(mapRef.current.getZoom(), 15), {
+    // ถ้าเป็นจุดเดียว ให้ setView ไปยังตำแหน่งนั้น
+    const currentCenter = mapRef.current.getCenter();
+    const currentZoom = mapRef.current.getZoom();
+    const targetZoom = Math.max(currentZoom, 15);
+    const isSame = currentCenter && currentCenter.lat === target.center.lat && currentCenter.lng === target.center.lng && currentZoom === targetZoom;
+    if (!isSame) {
+      mapRef.current.setView(target.center, targetZoom, {
         animate: true, // เปิด animation
       });
-    });
+    }
   };
+  // Effect: แสดง highlight ทุกครั้งที่ selectedFeature เปลี่ยน
+  useEffect(() => {
+    if (!selectedFeature) return;
+    const target = getFeatureViewTarget(selectedFeature);
+    if (target && mapRef.current) {
+      showHighlight(target.center);
+    }
+  }, [selectedFeature]);
 
   // === ส่วน Render ===
   return (
@@ -450,6 +507,7 @@ function App() {
             onLayerChange={ids => {
               setSelectedLayerIds(ids);          // อัปเดต layer ที่เลือก
               mapRef.current?.closePopup();      // ปิด popup เมื่อเปลี่ยน layer
+              hideHighlight();                    // ซ่อน highlight เมื่อเปลี่ยน layer
             }}
             collapsed={sidebarCollapsed}
             onCollapseChange={setSidebarCollapsed}
@@ -583,6 +641,7 @@ function App() {
                   setSelectedFeature(feature);       // เลือก feature สำหรับดูรายละเอียด
                   setDashboardCollapsed(false);       // เปิด dashboard ถ้าถูกย่ออยู่
                   mapRef.current?.closePopup();       // ปิด popup บนแผนที่
+                  handleZoomToFeature(feature);       // ซูมไปตำแหน่งฟาร์ม + แสดง highlight
                 }}
               />
             </MapContainer>
@@ -630,7 +689,7 @@ function App() {
               {selectedFeature ? (
                 <FeatureDetail
                   feature={selectedFeature}                 // ข้อมูล feature ที่เลือก
-                  onBack={() => setSelectedFeature(null)}   // กลับไปหน้าตาราง
+                  onBack={() => { setSelectedFeature(null); hideHighlight(); }}   // กลับไปหน้าตาราง + ซ่อน highlight
                   onZoomToFeature={handleZoomToFeature}     // ซูมไปตำแหน่งฟาร์ม
                   authToken={authToken}                     // token สำหรับอัปโหลดรูป
                 />
