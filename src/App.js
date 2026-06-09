@@ -542,6 +542,15 @@ function App() {
               {/* ชั้นแผนที่ฐาน (basemap) */}
               <TileLayer url={selectedBasemap.url} />
 
+              {/* แสดงขอบเขตอำเภอบนหน้าหลักตลอดเวลา โดยไม่ต้องให้ผู้ใช้เปิดจาก Sidebar */}
+              <WMSTileLayer
+                url="https://map.surveywms.com/geoserver/LiveStock/wms"
+                layers="LiveStock:Amphoe"
+                format="image/png"
+                transparent={true}
+                version="1.1.1"
+              />
+
               {/* ==================== Basemap Picker (เลือกแผนที่ฐาน) ==================== */}
               <div style={{
                 position: 'absolute', top: 10, right: 10, zIndex: 1000,
