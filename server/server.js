@@ -9,6 +9,7 @@
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -18,7 +19,19 @@ const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret-in-production';
+
+// === JWT secret — ต้องตั้งค่าผ่าน environment variable ===
+// production: บังคับให้ตั้ง JWT_SECRET ไม่งั้นหยุดทำงาน (กัน token ถูกปลอม)
+// dev: ถ้าไม่ตั้ง ใช้ค่า fallback ชั่วคราวพร้อมเตือน
+const JWT_SECRET = process.env.JWT_SECRET || (() => {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('FATAL: ต้องตั้งค่า environment variable JWT_SECRET สำหรับ production');
+    process.exit(1);
+  }
+  console.warn('⚠  ไม่ได้ตั้งค่า JWT_SECRET — ใช้ค่า fallback สำหรับ dev เท่านั้น (ห้ามใช้ใน production)');
+  return 'insecure-dev-secret-change-me';
+})();
+
 const UPLOADS_DIR = path.join(__dirname, 'uploads', 'farm-images');
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
 
@@ -27,7 +40,28 @@ fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 fs.mkdirSync(path.dirname(USERS_FILE), { recursive: true });
 
 // === Middleware ===
-app.use(cors());
+// helmet — ตั้งค่า HTTP security headers พื้นฐาน
+// crossOriginResourcePolicy: cross-origin เพื่อให้ frontend (คนละ origin) โหลดรูปจาก /uploads ได้
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
+// === CORS — จำกัดเฉพาะ origin ที่อนุญาต ===
+// ตั้งค่าได้ผ่าน env CORS_ORIGIN (คั่นหลาย origin ด้วย comma)
+const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || 'http://localhost:3000,https://map.surveywms.com')
+  .split(',')
+  .map(o => o.trim())
+  .filter(Boolean);
+
+app.use(cors({
+  origin(origin, cb) {
+    // อนุญาต request ที่ไม่มี origin (เช่น curl, mobile app, same-origin)
+    // origin ที่ไม่อยู่ในรายการ: ไม่ส่ง header CORS (เบราว์เซอร์จะบล็อกเอง)
+    // ใช้ cb(null, false) แทนการ throw เพื่อไม่ให้ stack trace รั่วไหล
+    cb(null, !origin || ALLOWED_ORIGINS.includes(origin));
+  },
+}));
+
 app.use(express.json());
 
 // Static serve รูปภาพ
