@@ -54,6 +54,13 @@
   flex-shrink: 0;
 }
 
+/* === หัวข้อกลุ่มย่อย (เช่น Heatmap) ภายในพื้นที่เลื่อน === */
+.sidebar-subheader {
+  padding: 14px 12px 6px;
+  margin-top: 6px;
+  border-top: 1px solid var(--c-border); /* เส้นแบ่งจากกลุ่มด้านบน */
+}
+
 /* ข้อความหัวข้อ — ตัวพิมพ์ใหญ่, ตัวเล็กมาก */
 .sidebar-header-title {
   font-size: 11px;

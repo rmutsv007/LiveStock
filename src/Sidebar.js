@@ -10,6 +10,9 @@ import React, { useState } from 'react';
 // === นำเข้าข้อมูลชั้นข้อมูลทั้งหมด ===
 import layers from './layers';
 
+// === นำเข้าข้อมูลชั้น Heatmap / ความหนาแน่น ===
+import heatmapLayers from './heatmapLayers';
+
 // === นำเข้า CSS สำหรับ Sidebar ===
 import './Sidebar.css';
 
@@ -44,12 +47,21 @@ const ExpandIcon = () => (
 );
 
 /**
+ * HeatIcon — ไอคอนสำหรับชั้น Heatmap (รูปคลื่นความร้อน)
+ */
+const HeatIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <path d="M10 2.5C10 2.5 5.5 6 5.5 11a4.5 4.5 0 0 0 9 0c0-2-1.2-3.6-1.2-3.6s-.3 1.4-1.3 1.9c.4-1.8-.3-4.3-2-6.7Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" fill="none"/>
+  </svg>
+);
+
+/**
  * Sidebar — คอมโพเนนต์แถบเมนูเลือกชั้นข้อมูล
  * @param {Function} onLayerChange - callback เมื่อเปลี่ยนชั้นข้อมูลที่เลือก (ส่ง array ของ IDs)
  * @param {boolean} collapsed - สถานะย่อ/ขยาย
  * @param {Function} onCollapseChange - callback เมื่อเปลี่ยนสถานะย่อ/ขยาย
  */
-const Sidebar = ({ onLayerChange, collapsed, onCollapseChange }) => {
+const Sidebar = ({ onLayerChange, onHeatmapChange, collapsed, onCollapseChange }) => {
   // ref สำหรับพื้นที่เลื่อนได้ (scroll area)
   const sidebarContentRef = React.useRef();
 
@@ -128,6 +140,25 @@ const Sidebar = ({ onLayerChange, collapsed, onCollapseChange }) => {
     setSelectedLayerIds(newIds);
   };
 
+  // === State: เก็บ ID ของชั้น Heatmap ที่ถูกเลือก (เริ่มต้นไม่เลือก) ===
+  const [selectedHeatmapIds, setSelectedHeatmapIds] = useState([]);
+
+  // แจ้ง parent เมื่อชั้น Heatmap ที่เลือกเปลี่ยน
+  React.useEffect(() => {
+    if (onHeatmapChange) onHeatmapChange(selectedHeatmapIds);
+  }, [selectedHeatmapIds, onHeatmapChange]);
+
+  /**
+   * handleHeatmapToggle — เปิด/ปิดชั้น Heatmap
+   */
+  const handleHeatmapToggle = layer => {
+    setSelectedHeatmapIds(prev =>
+      prev.includes(layer.id)
+        ? prev.filter(id => id !== layer.id)   // ยกเลิกการเลือก
+        : [...prev, layer.id]                  // เพิ่มเข้าไป
+    );
+  };
+
   return (
     // คอนเทนเนอร์ sidebar — เพิ่ม class 'collapsed' เมื่อย่อ
     <div className={`sidebar-container${collapsed ? ' collapsed' : ''}`}>
@@ -177,6 +208,38 @@ const Sidebar = ({ onLayerChange, collapsed, onCollapseChange }) => {
                   <span className="layer-name">{layer.name}</span>
                   <div className="layer-check">
                     <CheckIcon />  {/* ไอคอนเครื่องหมายถูก (แสดงเมื่อ active ผ่าน CSS) */}
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        })}
+
+        {/* ==================== ชั้น Heatmap / ความหนาแน่น ==================== */}
+        {!collapsed && (
+          <div className="sidebar-subheader">
+            <p className="sidebar-header-title">Heatmap / ความหนาแน่น</p>
+          </div>
+        )}
+        {heatmapLayers.map(layer => {
+          const isActive = selectedHeatmapIds.includes(layer.id);
+          return (
+            <div
+              key={layer.id}
+              className={`layer-item${isActive ? ' active' : ''}`}
+              onClick={() => handleHeatmapToggle(layer)}
+              title={layer.label}
+            >
+              {/* ไอคอน heatmap */}
+              <div className="layer-icon-wrapper">
+                <HeatIcon />
+              </div>
+              {/* ชื่อ + checkbox — แสดงเฉพาะเมื่อ sidebar ขยาย */}
+              {!collapsed && (
+                <>
+                  <span className="layer-name">{layer.label}</span>
+                  <div className="layer-check">
+                    <CheckIcon />
                   </div>
                 </>
               )}
