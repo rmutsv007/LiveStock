@@ -12,7 +12,7 @@ const heatmapLayers = [
   { id: 'heatmap_broiler', name: 'heatmap_broiler', label: 'heatmap_broiler' },
   { id: 'heatmap_dairy', name: 'heatmap_dairy', label: 'heatmap_dairy' },
   { id: 'heatmap_pig', name: 'heatmap_pig', label: 'heatmap_pig' },
-  { id: 'heatmap_poultry', name: 'heatmap_poultry', label: 'สัตว์ปีก' },
+  { id: 'heatmap_poultry', name: 'heatmap_poultry', label: 'heatmap_poultry' },
   { id: 'heatmap_ter', name: 'heatmap_ter', label: 'heatmap_ter' },
   { id: 'kernel_density_broiler', name: 'Kernel Density of Broiler Farms', label: 'Kernel Density of Broiler Farms' },
 ];
