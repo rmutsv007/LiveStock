@@ -29,6 +29,7 @@ import FeatureDetail from './FeatureDetail';     // หน้ารายละ�
 import Sidebar from './Sidebar';                 // แถบเมนูเลือกชั้นข้อมูล (ซ้าย)
 import Login from './Login';                     // หน้าเข้าสู่ระบบผู้ดูแล
 import layers from './layers';                   // รายการชั้นข้อมูลทั้งหมด
+import heatmapLayers from './heatmapLayers';     // รายการชั้น Heatmap / ความหนาแน่น
 
 // === นำเข้า CSS เพิ่มเติม ===
 import './MapOverrides.css';  // ปรับแต่ง style ของ Leaflet (popup, tooltip, zoom)
@@ -105,6 +106,59 @@ function getFeatureViewTarget(feature) {
  * @param {Object} props
  * @param {React.MutableRefObject} props.mapRef - ref สำหรับเก็บ map instance
  */
+/**
+ * HeatmapOpacityControl — แถบเลื่อนปรับความทึบ (opacity) ของชั้น Heatmap
+ * วางลอยมุมล่างซ้ายของแผนที่ — แสดงเฉพาะเมื่อมีชั้น Heatmap เปิดอยู่
+ * @param {number} props.value - ค่า opacity ปัจจุบัน (0–1)
+ * @param {Function} props.onChange - callback เมื่อเลื่อนแถบ
+ */
+function HeatmapOpacityControl({ value, onChange }) {
+  const ref = useRef(null);
+
+  // กันไม่ให้การลาก/คลิก/scroll บนแถบไปโดนถึงแผนที่ (ไม่ให้แผนที่เลื่อน/ซูม)
+  useEffect(() => {
+    if (ref.current) {
+      L.DomEvent.disableClickPropagation(ref.current);
+      L.DomEvent.disableScrollPropagation(ref.current);
+    }
+  }, []);
+
+  const percent = Math.round(value * 100);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        position: 'absolute', left: 10, bottom: 24, zIndex: 1000,
+        background: 'var(--c-bg-primary)',
+        border: '1px solid var(--c-border)',
+        borderRadius: 8,
+        padding: '10px 12px',
+        boxShadow: 'var(--c-shadow-lg)',
+        fontFamily: 'Sarabun, sans-serif',
+        width: 190,
+      }}
+    >
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        marginBottom: 8, fontSize: 12, fontWeight: 600, color: 'var(--c-text)',
+      }}>
+        <span>ความทึบ Heatmap</span>
+        <span style={{ color: 'var(--c-accent-light)' }}>{percent}%</span>
+      </div>
+      <input
+        type="range"
+        min={0}
+        max={100}
+        value={percent}
+        onChange={e => onChange(Number(e.target.value) / 100)}
+        aria-label="ปรับความทึบ Heatmap"
+        style={{ width: '100%', accentColor: 'var(--c-accent)', cursor: 'pointer' }}
+      />
+    </div>
+  );
+}
+
 function MapInstanceBridge({ mapRef }) {
   const map = useMap(); // ดึง Leaflet map instance จาก react-leaflet context
 
@@ -134,6 +188,8 @@ function App() {
   const [filteredPoints, setFilteredPoints] = useState([]);              // ข้อมูลจุดที่ผ่านการกรอง
   const searchValue = "";                                                 // ค่าค้นหา (ปัจจุบันตั้งค่าคงที่)
   const [selectedLayerIds, setSelectedLayerIds] = useState([]);          // ID ของ Layer ที่เลือกแสดง
+  const [selectedHeatmapIds, setSelectedHeatmapIds] = useState([]);      // ID ของชั้น Heatmap ที่เลือก
+  const [heatmapOpacity, setHeatmapOpacity] = useState(0.4);             // ความทึบ Heatmap (เริ่มต้น 40%)
   const [selectedFeature, setSelectedFeature] = useState(null);          // Feature ที่ถูกเลือกดูรายละเอียด
   const [basemapId, setBasemapId] = useState(() => localStorage.getItem('basemap') || 'osm'); // ID แผนที่ฐานปัจจุบัน
   const [basemapOpen, setBasemapOpen] = useState(false);                 // สถานะเปิด/ปิด dropdown เลือกแผนที่ฐาน
@@ -509,6 +565,7 @@ function App() {
               mapRef.current?.closePopup();      // ปิด popup เมื่อเปลี่ยน layer
               hideHighlight();                    // ซ่อน highlight เมื่อเปลี่ยน layer
             }}
+            onHeatmapChange={setSelectedHeatmapIds}
             collapsed={sidebarCollapsed}
             onCollapseChange={setSidebarCollapsed}
           />
@@ -641,6 +698,27 @@ function App() {
                     version="1.1.1"                                           // เวอร์ชัน WMS
                   />
                 ))}
+
+              {/* ==================== Heatmap Layers (ราสเตอร์ความหนาแน่น) ==================== */}
+              {/* ชั้น Heatmap ที่เลือก — ปรับความทึบร่วมกันผ่านแถบเลื่อน */}
+              {heatmapLayers
+                .filter(l => selectedHeatmapIds.includes(l.id))
+                .map(layer => (
+                  <WMSTileLayer
+                    key={layer.id}
+                    url="https://map.surveywms.com/geoserver/LiveStock/wms"
+                    layers={`LiveStock:${layer.name}`}
+                    format="image/png"
+                    transparent={true}
+                    version="1.1.1"
+                    opacity={heatmapOpacity}                                   // ความทึบจากแถบเลื่อน
+                  />
+                ))}
+
+              {/* แถบเลื่อนปรับความทึบ — แสดงเฉพาะเมื่อมีชั้น Heatmap เปิดอยู่ */}
+              {selectedHeatmapIds.length > 0 && (
+                <HeatmapOpacityControl value={heatmapOpacity} onChange={setHeatmapOpacity} />
+              )}
 
               {/* ==================== Data Points (จุดข้อมูลบนแผนที่) ==================== */}
               {/* วาด Circle สำหรับแต่ละฟาร์ม และเปิด popup เมื่อคลิก */}
