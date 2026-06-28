@@ -13,8 +13,6 @@ const heatmapLayers = [
   { id: 'heatmap_dairy', name: 'heatmap_dairy', label: 'ฟาร์มโคนม' },
   { id: 'heatmap_pig', name: 'heatmap_pig', label: 'ฟาร์มหมู' },
   { id: 'heatmap_poultry', name: 'heatmap_poultry', label: 'ฟาร์มสัตว์ปีก' },
-  { id: 'heatmap_ter', name: 'heatmap_ter', label: 'ฟาร์มสุกร' },
-  { id: 'kernel_density_broiler', name: 'Kernel Density of Broiler Farms', label: 'Kernel Density of Broiler Farms' },
 ];
 
 export default heatmapLayers; // ส่งออกรายการ heatmap layers
