@@ -179,6 +179,7 @@ function MapInstanceBridge({ mapRef }) {
 /**
  * LayerPaneSetup — สร้าง Leaflet panes สำหรับควบคุมลำดับการซ้อนของชั้นข้อมูล
  * heatmap จะอยู่ใต้ชั้นปศุสัตว์เสมอ ไม่ว่าผู้ใช้จะเปิด/ปิดลำดับไหนก่อน
+ * waterway จะอยู่ต่ำกว่า heatmap 1 ระดับเสมอ
  */
 function LayerPaneSetup() {
   const map = useMap();
@@ -190,11 +191,15 @@ function LayerPaneSetup() {
     if (!map.getPane('heatmapPane')) {
       map.createPane('heatmapPane');
     }
+    if (!map.getPane('waterwayPane')) {
+      map.createPane('waterwayPane');
+    }
     if (!map.getPane('livestockPane')) {
       map.createPane('livestockPane');
     }
 
     map.getPane('amphoePane').style.zIndex = 330;
+    map.getPane('waterwayPane').style.zIndex = 339;
     map.getPane('heatmapPane').style.zIndex = 340;
     map.getPane('livestockPane').style.zIndex = 350;
   }, [map]);
@@ -369,7 +374,7 @@ function App() {
     // แปลง layers เป็น flat array (รองรับทั้งแบบมี category และไม่มี)
     const flatLayers = layers.flatMap(cat => cat.items || [cat]);
     // กรองเฉพาะ layer ที่ถูกเลือก
-    const selectedLayers = flatLayers.filter(l => selectedLayerIds.includes(l.id));
+    const selectedLayers = flatLayers.filter(l => selectedLayerIds.includes(l.id) && l.kind !== 'line');
 
     // ถ้าไม่มี layer ที่เลือก ให้ล้างข้อมูลจุด
     if (!selectedLayers.length) {
@@ -724,7 +729,7 @@ function App() {
                     format="image/png"                                        // รูปแบบภาพ
                     transparent={true}                                        // พื้นหลังโปร่งใส
                     version="1.1.1"                                           // เวอร์ชัน WMS
-                    pane="livestockPane"
+                    pane={layer.id === 'waterway' ? 'waterwayPane' : 'livestockPane'}
                   />
                 ))}
 

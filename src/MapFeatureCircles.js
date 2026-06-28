@@ -10,6 +10,46 @@ import L from 'leaflet';  // Leaflet library (สำหรับสร้าง 
 import React from 'react';
 
 /**
+ * getFeatureCenter — หาพิกัดศูนย์กลางของ feature แบบปลอดภัย
+ * รองรับทั้ง Point, LineString, Polygon และกรณี geometry ว่าง
+ * @param {Object} feature - GeoJSON feature
+ * @returns {L.LatLng|null}
+ */
+export function getFeatureCenter(feature) {
+  if (!feature) return null;
+
+  try {
+    const geoJsonLayer = L.geoJSON(feature);
+    const bounds = geoJsonLayer.getBounds();
+    if (bounds?.isValid()) {
+      const center = bounds.getCenter();
+      if (Number.isFinite(center?.lat) && Number.isFinite(center?.lng)) {
+        return center;
+      }
+    }
+  } catch {
+    // fallback ด้านล่าง
+  }
+
+  let coords = feature?.geometry?.coordinates;
+  while (Array.isArray(coords) && Array.isArray(coords[0])) {
+    coords = coords[0];
+  }
+
+  if (!Array.isArray(coords) || coords.length < 2) {
+    return null;
+  }
+
+  const lng = Number(coords[0]);
+  const lat = Number(coords[1]);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return null;
+  }
+
+  return L.latLng(lat, lng);
+}
+
+/**
  * buildPopupContent — สร้าง DOM element สำหรับ popup ของแต่ละจุดข้อมูล
  * ใช้ DOM API โดยตรง (ไม่ใช่ JSX) เพราะ Leaflet popup ต้องการ DOM node
  * @param {Object} feature - GeoJSON feature
@@ -146,11 +186,7 @@ export function MapFeatureCircle({ feature, featureKey, onViewDetail }) {
   const popupRef = React.useRef(null);     // ref เก็บ popup ที่เปิดอยู่
   const [zoom, setZoom] = React.useState(map.getZoom()); // ระดับ zoom ปัจจุบัน
 
-  // ดึงพิกัดจาก geometry
-  let coords = feature.geometry?.coordinates;
-  if (Array.isArray(coords) && Array.isArray(coords[0])) {
-    coords = coords[0]; // ถ้าเป็น nested array ให้ดึงลงไป
-  }
+  const center = getFeatureCenter(feature);
 
   // ฟัง event zoomend เพื่ออัปเดตขนาด Circle
   useMapEvents({
@@ -168,13 +204,10 @@ export function MapFeatureCircle({ feature, featureKey, onViewDetail }) {
   }, [map]);
 
   // ถ้าไม่มีพิกัด ไม่ render
-  if (!coords || coords.length < 2) {
+  if (!center) {
     return null;
   }
-
-  // แปลง GeoJSON [lng, lat] → Leaflet [lat, lng]
-  const [lng, lat] = coords;
-  const center = [lat, lng];
+  const { lat, lng } = center;
 
   // คำนวณรัศมี Circle ตามระดับ zoom
   const baseRadius = 200;                         // รัศมีฐาน (เมตร)

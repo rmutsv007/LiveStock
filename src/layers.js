@@ -19,6 +19,7 @@ const layers = [
   { id: 'factory', name: 'ผึ้งชันโรง' },     // ผึ้งชันโรง
   { id: 'egg_station', name: 'สถานที่ฟักไข่' }, // สถานที่ฟักไข่
   { id: 'pangchang', name: 'ปางช้าง' },      // ปางช้าง
+  { id: 'waterway', name: 'WaterWay', kind: 'line' }, // ทางน้ำ (line layer)
 ];
 
 export default layers; // ส่งออกรายการ layers

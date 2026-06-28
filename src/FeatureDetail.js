@@ -7,6 +7,7 @@
 import React from 'react';
 import layers from './layers'; // รายการชั้นข้อมูลสำหรับแสดงไอคอนประเภท
 import FarmImage from './FarmImage'; // คอมโพเนนต์แสดง/อัปโหลดรูปฟาร์ม
+import { getFeatureCenter } from './MapFeatureCircles';
 
 /**
  * FeatureDetail — หน้าแสดงรายละเอียดฟาร์ม
@@ -23,13 +24,10 @@ const FeatureDetail = ({ feature, onBack, onZoomToFeature, authToken }) => {
   const typeName = (p.Type || '').trim();
   const layer = layers.find(l => (l.name || '').trim() === typeName);
 
-  // ดึงพิกัด [lng, lat] จาก geometry
-  let coords = feature.geometry?.coordinates;
-  if (Array.isArray(coords) && Array.isArray(coords[0])) {
-    coords = coords[0]; // ถ้าเป็น nested array ให้ดึงลงไปอีกระดับ
-  }
-  const lng = coords?.[0]; // ลองจิจูด
-  const lat = coords?.[1]; // ละติจูด
+  // ดึงพิกัดแบบปลอดภัยจาก geometry
+  const center = getFeatureCenter(feature);
+  const lat = center?.lat; // ละติจูด
+  const lng = center?.lng; // ลองจิจูด
 
   // รายการฟิลด์ข้อมูลที่จะแสดง
   const fields = [
@@ -162,7 +160,7 @@ const FeatureDetail = ({ feature, onBack, onZoomToFeature, authToken }) => {
         </div>
 
         {/* === ปุ่มดำเนินการ — แสดงเฉพาะเมื่อมีพิกัด === */}
-        {lat && lng && (
+        {Number.isFinite(lat) && Number.isFinite(lng) && (
           <div style={{ textAlign: 'center', marginTop: 20, display: 'flex', justifyContent: 'center', gap: 10 }}>
             {/* ปุ่มซูมไปตำแหน่งบนแผนที่ */}
             <button
