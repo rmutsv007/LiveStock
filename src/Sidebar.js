@@ -188,24 +188,25 @@ const Sidebar = ({ onLayerChange, onHeatmapChange, collapsed, onCollapseChange }
         {/* วนลูปแสดงแต่ละ layer */}
         {flatLayers.map(layer => {
           const isActive = selectedLayerIds.includes(layer.id); // ตรวจสอบว่าถูกเลือกหรือไม่
+          const displayName = layer.label || layer.name;
           return (
             <div
               key={layer.id}
               className={`layer-item${isActive ? ' active' : ''}`}  // เพิ่ม class 'active' ถ้าเลือก
               onClick={() => handleLayerToggle(layer)}               // คลิกเพื่อเปิด/ปิด
-              title={layer.name}                                     // tooltip แสดงชื่อ layer
+              title={displayName}                                    // tooltip แสดงชื่อ layer
             >
               {/* ไอคอน layer — ดึงจาก GeoServer GetLegendGraphic */}
               <div className="layer-icon-wrapper">
                 <img
                   src={`https://map.surveywms.com/geoserver/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=LiveStock:${encodeURIComponent(layer.name)}&LEGEND_OPTIONS=${encodeURIComponent('dpi:2400;antialiasing:on;fontAntiAliasing:on;forceRule:True;symbolWidth:40;symbolHeight:40')}&TRANSPARENT=true`}
-                  alt={layer.name}
+                  alt={displayName}
                 />
               </div>
               {/* ชื่อ layer และ checkbox — แสดงเฉพาะเมื่อ sidebar ขยาย */}
               {!collapsed && (
                 <>
-                  <span className="layer-name">{layer.name}</span>
+                  <span className="layer-name">{displayName}</span>
                   <div className="layer-check">
                     <CheckIcon />  {/* ไอคอนเครื่องหมายถูก (แสดงเมื่อ active ผ่าน CSS) */}
                   </div>

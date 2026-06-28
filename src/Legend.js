@@ -30,6 +30,9 @@ const Legend = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {/* วนลูปแสดงแต่ละ layer */}
         {layers.map(layer => (
+          (() => {
+            const displayName = layer.label || layer.name;
+            return (
           <div key={layer.id} style={{
             display: 'flex',
             alignItems: 'center',
@@ -55,13 +58,15 @@ const Legend = () => {
               {/* รูปไอคอนจาก GeoServer */}
               <img
                 src={getLegendUrl(layer.name)}
-                alt={layer.name}
+                alt={displayName}
                 style={{ width: 20, height: 20, objectFit: 'contain' }}
               />
             </div>
             {/* ชื่อ layer */}
-            <span style={{ fontSize: 13, color: 'var(--c-text)', fontWeight: 500 }}>{layer.name}</span>
+            <span style={{ fontSize: 13, color: 'var(--c-text)', fontWeight: 500 }}>{displayName}</span>
           </div>
+            );
+          })()
         ))}
       </div>
     </>
